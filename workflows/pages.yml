@@ -1,0 +1,38 @@
+name: Publicar Cocriando em 7
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preparar GitHub Pages
+        id: pages
+        uses: actions/configure-pages@v5
+      - name: Configurar endereço e preparar arquivos públicos
+        env:
+          SITE_BASE_URL: ${{ steps.pages.outputs.base_url }}
+        run: |
+          python3 scripts/configurar-publicacao.py "$SITE_BASE_URL"
+          mkdir -p _site
+          cp index.html styles.css script.js politica-de-privacidade.html termos-de-uso.html robots.txt sitemap.xml .nojekyll _site/
+          cp -R assets _site/assets
+      - name: Enviar arquivos para publicação
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - name: Publicar
+        id: deployment
+        uses: actions/deploy-pages@v4

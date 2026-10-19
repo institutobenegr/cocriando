@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /
+# A URL real e a indexação são configuradas na publicação.
+Sitemap: https://example.invalid/cocriando-em-7/sitemap.xml
